@@ -18,15 +18,16 @@ Desenvolvimento dividido em etapas sequenciais. Cada etapa tem entregável test�
 
 ---
 
-## Etapa 1 — Backend: Auth
-> Objetivo: usuário consegue criar conta e fazer login via API.
+## Etapa 1 — Backend: Auth ✅
+> Concluída e testada via Swagger.
 
-- [ ] Setup do FastAPI + SQLite (via SQLAlchemy)
-- [ ] Modelo `User` no banco (id, nome, sobrenome, email, senha hash, pergunta_seguranca, resposta_seguranca, cidade, estado)
-- [ ] Endpoint `POST /auth/register` — criar conta
-- [ ] Endpoint `POST /auth/login` — retorna JWT
-- [ ] Middleware que valida JWT em rotas protegidas
-- [ ] Testar com Postman ou curl
+- [x] Setup do FastAPI + SQLite (via SQLAlchemy)
+- [x] Modelo `User` no banco (id, nome, sobrenome, email, senha hash, pergunta_seguranca, resposta_seguranca, cidade, estado)
+- [x] Endpoint `POST /auth/register` — criar conta
+- [x] Endpoint `POST /auth/login` — retorna JWT
+- [x] Endpoint `GET /auth/me` — dados do usuário logado (requer JWT)
+- [x] Endpoints `POST /auth/recuperar-senha/pergunta` e `/redefinir`
+- [x] Middleware HTTPBearer valida JWT em rotas protegidas
 
 ---
 
