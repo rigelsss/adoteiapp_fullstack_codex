@@ -45,35 +45,36 @@ Desenvolvimento dividido em etapas sequenciais. Cada etapa tem entregável test�
 
 ---
 
-## Etapa 3 — Flutter: Setup + Telas de Auth
-> Objetivo: splash, login e cadastro funcionando e conectados ao backend.
+## Etapa 3 — Flutter: Setup + Telas de Auth ✅
+> Concluída.
 
-- [ ] Setup do projeto Flutter (pacotes: `http`, `shared_preferences`, `go_router`)
-- [ ] Tela Splash / Boas-vindas (print 2) — "Já tenho conta" e "Continuar como visitante"
-- [ ] Tela Login (print 1) — conectada ao `POST /auth/login`, salva JWT localmente
-- [ ] Tela Cadastro (prints 3 e 4) — fluxo em 2 passos, conectado ao `POST /auth/register`
-- [ ] Gerenciamento de estado de autenticação (ex.: Provider ou Riverpod)
-- [ ] Redirecionamento automático: logado → Home, visitante → Home (modo leitura)
-
----
-
-## Etapa 4 — Flutter: Home + Listagem de Pets
-> Objetivo: tela principal com listagem e busca funcionando.
-
-- [ ] Tela Home (print 5) — barra de busca + filtros + lista de cards de pets
-- [ ] Card de pet com foto, nome e espécie
-- [ ] Filtros por espécie/categoria (chips horizontais)
-- [ ] Barra de busca conectada ao `GET /pets?q=...`
-- [ ] Seção "Próximos de mim" — filtra por cidade/estado do perfil do usuário
+- [x] Setup do projeto Flutter (pacotes: `http`, `shared_preferences`, `go_router`)
+- [x] Tela Splash / Boas-vindas (print 2) — "Já tenho conta" e "Continuar como visitante"
+- [x] Tela Login (print 1) — conectada ao `POST /auth/login`, salva JWT localmente
+- [x] Tela Cadastro (prints 3 e 4) — fluxo em 2 passos, conectado ao `POST /auth/register`
+- [x] Gerenciamento de estado de autenticação (Provider)
+- [x] Redirecionamento automático: logado → Home, visitante → Home (modo leitura)
 
 ---
 
-## Etapa 5 — Flutter: Detalhes do Pet + Cadastrar Anúncio
-> Objetivo: fluxo completo de anúncio — ver e criar.
+## Etapa 4 — Flutter: Home + Listagem de Pets ✅
+> Concluída.
 
-- [ ] Tela Página de Anúncio — fotos, nome, descrição, botão "Quero adotar"
-- [ ] Tela Criar Anúncio — formulário conectado ao `POST /pets`
-- [ ] Ação "Quero adotar" — registra interesse do usuário (Opção B: dono visualiza interessados)
+- [x] Tela Home (print 5) — barra de busca + filtros + lista de cards de pets
+- [x] Card de pet com foto, nome e espécie
+- [x] Filtros por espécie/categoria (chips circulares horizontais)
+- [x] Barra de busca conectada ao `GET /pets?q=...` com debounce de 500ms
+- [x] Seção "Próximos de mim" — filtra por cidade/estado do perfil do usuário
+
+---
+
+## Etapa 5 — Flutter: Detalhes do Pet + Cadastrar Anúncio ✅
+> Concluída.
+
+- [x] Tela Página de Anúncio — foto hero, nome, descrição, botão "Quero adotar"
+- [x] Tela Criar Anúncio — formulário conectado ao `POST /pets` (FAB na Home)
+- [x] Ação "Quero adotar" — registra interesse; visitante é redirecionado ao login
+- [x] Opção B: dono vê botão "Ver interessados" com lista em bottom sheet
 
 ---
 

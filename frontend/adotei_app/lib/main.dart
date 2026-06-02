@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/constants.dart';
 import 'providers/auth_provider.dart';
+import 'providers/pet_provider.dart';
 import 'router/app_router.dart';
 
 void main() async {
@@ -9,8 +10,11 @@ void main() async {
   final auth = AuthProvider();
   await auth.tryAutoLogin();
   runApp(
-    ChangeNotifierProvider.value(
-      value: auth,
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: auth),
+        ChangeNotifierProvider(create: (_) => PetProvider()),
+      ],
       child: const AdoteiApp(),
     ),
   );
