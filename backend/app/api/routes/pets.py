@@ -22,9 +22,15 @@ def listar_pets(
     porte: str | None = Query(None, description="pequeno, médio, grande"),
     cidade: str | None = Query(None),
     estado: str | None = Query(None),
+    dono_id: int | None = Query(None, description="Filtra por dono (retorna todos os status)"),
     db: Session = Depends(get_db),
 ):
-    query = db.query(Pet).filter(Pet.status == "disponível")
+    query = db.query(Pet)
+
+    if dono_id is not None:
+        query = query.filter(Pet.dono_id == dono_id)
+    else:
+        query = query.filter(Pet.status == "disponível")
 
     if q:
         termo = f"%{q.lower()}%"

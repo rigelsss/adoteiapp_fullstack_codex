@@ -129,17 +129,30 @@ class _HomeScreenState extends State<HomeScreen> {
               offset: const Offset(0, 48),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               onSelected: (value) async {
-                if (value == 'logout') {
+                if (value == 'perfil') {
+                  context.push('/perfil');
+                } else if (value == 'logout') {
                   final router = GoRouter.of(context);
                   await context.read<AuthProvider>().logout();
                   router.go('/');
                 }
               },
               itemBuilder: (_) => [
-                PopupMenuItem(
+                const PopupMenuItem(
+                  value: 'perfil',
+                  child: Row(
+                    children: [
+                      Icon(Icons.person_outline, size: 18, color: AppColors.blue),
+                      SizedBox(width: 10),
+                      Text('Meu perfil'),
+                    ],
+                  ),
+                ),
+                const PopupMenuDivider(),
+                const PopupMenuItem(
                   value: 'logout',
                   child: Row(
-                    children: const [
+                    children: [
                       Icon(Icons.logout, size: 18, color: Colors.redAccent),
                       SizedBox(width: 10),
                       Text('Sair', style: TextStyle(color: Colors.redAccent)),

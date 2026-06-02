@@ -5,7 +5,7 @@ import '../services/pet_service.dart';
 class PetProvider extends ChangeNotifier {
   final PetService _service = PetService();
 
-  // ── Lista principal ──────────────────────────────────────────────────────────
+  // ── Lista principal (home) ───────────────────────────────────────────────────
   List<Pet> _pets = [];
   List<Pet> _petsProximos = [];
   String? _filtroEspecie;
@@ -79,6 +79,34 @@ class PetProvider extends ChangeNotifier {
       _loadingDetalhe = false;
       notifyListeners();
     }
+  }
+
+  // ── Perfil do usuário ────────────────────────────────────────────────────────
+  List<Pet> _meusPets = [];
+  bool _loadingMeusPets = false;
+
+  List<Pet> get meusPets => _meusPets;
+  bool get isLoadingMeusPets => _loadingMeusPets;
+
+  Future<void> carregarMeusPets(int donoId) async {
+    _loadingMeusPets = true;
+    notifyListeners();
+    try {
+      _meusPets = await _service.listarPets(donoId: donoId);
+    } catch (_) {
+      _meusPets = [];
+    } finally {
+      _loadingMeusPets = false;
+      notifyListeners();
+    }
+  }
+
+  // Throws PetException on failure.
+  Future<void> deletarPet(int petId, String token) async {
+    await _service.deletarPet(petId, token);
+    _meusPets.removeWhere((p) => p.id == petId);
+    _pets.removeWhere((p) => p.id == petId);
+    notifyListeners();
   }
 
   // ── Ações ────────────────────────────────────────────────────────────────────

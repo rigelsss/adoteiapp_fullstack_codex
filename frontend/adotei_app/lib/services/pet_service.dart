@@ -17,6 +17,7 @@ class PetService {
     String? porte,
     String? cidade,
     String? estado,
+    int? donoId,
   }) async {
     final params = <String, String>{};
     if (q != null && q.isNotEmpty) params['q'] = q;
@@ -24,6 +25,7 @@ class PetService {
     if (porte != null) params['porte'] = porte;
     if (cidade != null) params['cidade'] = cidade;
     if (estado != null) params['estado'] = estado;
+    if (donoId != null) params['dono_id'] = donoId.toString();
 
     final uri = Uri.parse('$kApiBase/pets')
         .replace(queryParameters: params.isEmpty ? null : params);
@@ -86,6 +88,15 @@ class PetService {
       return Pet.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
     }
     throw PetException(_extrairDetalhe(response.body, 'Erro ao cadastrar pet'));
+  }
+
+  Future<void> deletarPet(int petId, String token) async {
+    final response = await http.delete(
+      Uri.parse('$kApiBase/pets/$petId'),
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (response.statusCode == 204) return;
+    throw PetException(_extrairDetalhe(response.body, 'Erro ao remover pet'));
   }
 
   Future<List<InteressadoInfo>> listarInteressados(int petId, String token) async {

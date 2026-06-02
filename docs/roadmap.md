@@ -78,12 +78,13 @@ Desenvolvimento dividido em etapas sequenciais. Cada etapa tem entregável test�
 
 ---
 
-## Etapa 6 — Flutter: Perfil do Usuário
-> Objetivo: usuário visualiza e gerencia seus anúncios.
+## Etapa 6 — Flutter: Perfil do Usuário ✅
+> Concluída.
 
-- [ ] Tela Perfil — nome, e-mail, lista de pets cadastrados pelo usuário
-- [ ] Opção de excluir pet cadastrado
-- [ ] Logout (limpa JWT salvo localmente)
+- [x] Tela Perfil — nome, e-mail, localidade, lista de pets cadastrados pelo usuário
+- [x] Opção de excluir pet cadastrado (dialog de confirmação)
+- [x] Logout com dialog de confirmação (limpa JWT salvo localmente)
+- [x] Backend: filtro `dono_id` em `GET /pets` para listar todos os pets do dono
 
 ---
 
