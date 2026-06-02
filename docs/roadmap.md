@@ -31,17 +31,17 @@ Desenvolvimento dividido em etapas sequenciais. Cada etapa tem entregável test�
 
 ---
 
-## Etapa 2 — Backend: Pets
-> Objetivo: CRUD de pets funcionando via API.
+## Etapa 2 — Backend: Pets ✅
+> Concluída e testada via Swagger.
 
-- [ ] Modelo `Pet` no banco (id, nome, espécie, raça, idade, porte, descrição, foto_url, cidade, estado, status, dono_id)
-- [ ] Endpoint `GET /pets` — listar todos os pets disponíveis (público)
-- [ ] Endpoint `GET /pets/{id}` — detalhe de um pet (público)
-- [ ] Endpoint `POST /pets` — cadastrar pet (requer JWT)
-- [ ] Endpoint `DELETE /pets/{id}` — remover pet (requer JWT, apenas dono)
-- [ ] Endpoint `GET /pets/search?q=...` — buscar pets por nome/espécie
-- [ ] Endpoint `POST /pets/{id}/interesse` — registrar interesse em adotar (requer JWT)
-- [ ] Endpoint `GET /pets/{id}/interessados` — listar interessados (requer JWT, apenas dono)
+- [x] Modelos `Pet` e `Interesse` no banco
+- [x] Endpoint `GET /pets` — lista disponíveis, com filtros: `q`, `especie`, `porte`, `cidade`, `estado`
+- [x] Endpoint `GET /pets/{id}` — detalhe com info do dono (público)
+- [x] Endpoint `POST /pets` — cadastrar pet (requer JWT)
+- [x] Endpoint `DELETE /pets/{id}` — remover pet (requer JWT, apenas dono)
+- [x] Endpoint `POST /pets/{id}/interesse` — registrar interesse (requer JWT)
+- [x] Endpoint `GET /pets/{id}/interessados` — listar interessados (requer JWT, apenas dono)
+- [x] `seed.py` — 2 usuários + 15 pets de teste (SP e PE)
 
 ---
 
@@ -63,7 +63,7 @@ Desenvolvimento dividido em etapas sequenciais. Cada etapa tem entregável test�
 - [ ] Tela Home (print 5) — barra de busca + filtros + lista de cards de pets
 - [ ] Card de pet com foto, nome e espécie
 - [ ] Filtros por espécie/categoria (chips horizontais)
-- [ ] Barra de busca conectada ao `GET /pets/search`
+- [ ] Barra de busca conectada ao `GET /pets?q=...`
 - [ ] Seção "Próximos de mim" — filtra por cidade/estado do perfil do usuário
 
 ---
