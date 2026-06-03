@@ -14,3 +14,5 @@ frontend/build/
 frontend/.dart_tool/
 frontend/**/*.g.dart
 frontend/**/*.freezed.dart
+docs/
+prints/

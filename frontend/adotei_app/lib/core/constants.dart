@@ -8,4 +8,4 @@ class AppColors {
 
 // Desenvolvimento local (emulador Android): 'http://10.0.2.2:8000'
 // Produção: substitua pela URL gerada no Render após o deploy
-const String kApiBase = 'https://adotei-api.onrender.com';
+const String kApiBase = 'https://adoteiapp-fullstack-codex.onrender.com';

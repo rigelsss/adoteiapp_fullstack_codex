@@ -11,12 +11,18 @@ class AuthException implements Exception {
 }
 
 class AuthService {
+  static const _timeout = Duration(seconds: 60);
+  static const _timeoutMsg =
+      'Servidor demorando para responder. Tente novamente.';
+
   Future<String> login(String email, String senha) async {
-    final response = await http.post(
-      Uri.parse('$kApiBase/auth/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email, 'senha': senha}),
-    );
+    final response = await http
+        .post(
+          Uri.parse('$kApiBase/auth/login'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'email': email, 'senha': senha}),
+        )
+        .timeout(_timeout, onTimeout: () => throw AuthException(_timeoutMsg));
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['access_token'] as String;
     }
@@ -31,18 +37,20 @@ class AuthService {
     required String perguntaSeguranca,
     required String respostaSeguranca,
   }) async {
-    final response = await http.post(
-      Uri.parse('$kApiBase/auth/register'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'nome': nome,
-        'sobrenome': sobrenome,
-        'email': email,
-        'senha': senha,
-        'pergunta_seguranca': perguntaSeguranca,
-        'resposta_seguranca': respostaSeguranca,
-      }),
-    );
+    final response = await http
+        .post(
+          Uri.parse('$kApiBase/auth/register'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({
+            'nome': nome,
+            'sobrenome': sobrenome,
+            'email': email,
+            'senha': senha,
+            'pergunta_seguranca': perguntaSeguranca,
+            'resposta_seguranca': respostaSeguranca,
+          }),
+        )
+        .timeout(_timeout, onTimeout: () => throw AuthException(_timeoutMsg));
     if (response.statusCode == 201) {
       return User.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
     }
@@ -50,10 +58,12 @@ class AuthService {
   }
 
   Future<User> getMe(String token) async {
-    final response = await http.get(
-      Uri.parse('$kApiBase/auth/me'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
+    final response = await http
+        .get(
+          Uri.parse('$kApiBase/auth/me'),
+          headers: {'Authorization': 'Bearer $token'},
+        )
+        .timeout(_timeout, onTimeout: () => throw AuthException(_timeoutMsg));
     if (response.statusCode == 200) {
       return User.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
     }
@@ -61,11 +71,13 @@ class AuthService {
   }
 
   Future<String> getPerguntaSeguranca(String email) async {
-    final response = await http.post(
-      Uri.parse('$kApiBase/auth/recuperar-senha/pergunta'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email}),
-    );
+    final response = await http
+        .post(
+          Uri.parse('$kApiBase/auth/recuperar-senha/pergunta'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'email': email}),
+        )
+        .timeout(_timeout, onTimeout: () => throw AuthException(_timeoutMsg));
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['pergunta'] as String;
     }
@@ -77,11 +89,14 @@ class AuthService {
     required String resposta,
     required String novaSenha,
   }) async {
-    final response = await http.post(
-      Uri.parse('$kApiBase/auth/recuperar-senha/redefinir'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'email': email, 'resposta': resposta, 'nova_senha': novaSenha}),
-    );
+    final response = await http
+        .post(
+          Uri.parse('$kApiBase/auth/recuperar-senha/redefinir'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode(
+              {'email': email, 'resposta': resposta, 'nova_senha': novaSenha}),
+        )
+        .timeout(_timeout, onTimeout: () => throw AuthException(_timeoutMsg));
     if (response.statusCode != 200) {
       throw AuthException(_detail(response, 'Resposta incorreta'));
     }
@@ -89,7 +104,8 @@ class AuthService {
 
   String _detail(http.Response r, String fallback) {
     try {
-      return (jsonDecode(r.body) as Map<String, dynamic>)['detail'] as String? ?? fallback;
+      return (jsonDecode(r.body) as Map<String, dynamic>)['detail'] as String? ??
+          fallback;
     } catch (_) {
       return fallback;
     }

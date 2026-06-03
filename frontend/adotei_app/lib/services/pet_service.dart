@@ -11,6 +11,10 @@ class PetException implements Exception {
 }
 
 class PetService {
+  static const _timeout = Duration(seconds: 60);
+  static const _timeoutMsg =
+      'Servidor demorando para responder. Tente novamente.';
+
   Future<List<Pet>> listarPets({
     String? q,
     String? especie,
@@ -29,7 +33,9 @@ class PetService {
 
     final uri = Uri.parse('$kApiBase/pets')
         .replace(queryParameters: params.isEmpty ? null : params);
-    final response = await http.get(uri);
+    final response = await http
+        .get(uri)
+        .timeout(_timeout, onTimeout: () => throw PetException(_timeoutMsg));
 
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
@@ -39,18 +45,23 @@ class PetService {
   }
 
   Future<PetDetail> buscarPet(int id) async {
-    final response = await http.get(Uri.parse('$kApiBase/pets/$id'));
+    final response = await http
+        .get(Uri.parse('$kApiBase/pets/$id'))
+        .timeout(_timeout, onTimeout: () => throw PetException(_timeoutMsg));
     if (response.statusCode == 200) {
-      return PetDetail.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
+      return PetDetail.fromJson(
+          jsonDecode(response.body) as Map<String, dynamic>);
     }
     throw PetException('Pet não encontrado');
   }
 
   Future<void> registrarInteresse(int petId, String token) async {
-    final response = await http.post(
-      Uri.parse('$kApiBase/pets/$petId/interesse'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
+    final response = await http
+        .post(
+          Uri.parse('$kApiBase/pets/$petId/interesse'),
+          headers: {'Authorization': 'Bearer $token'},
+        )
+        .timeout(_timeout, onTimeout: () => throw PetException(_timeoutMsg));
     if (response.statusCode == 201) return;
     throw PetException(_extrairDetalhe(response.body, 'Erro ao registrar interesse'));
   }
@@ -76,14 +87,16 @@ class PetService {
     if (cidade != null && cidade.isNotEmpty) body['cidade'] = cidade;
     if (estado != null && estado.isNotEmpty) body['estado'] = estado;
 
-    final response = await http.post(
-      Uri.parse('$kApiBase/pets'),
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      },
-      body: jsonEncode(body),
-    );
+    final response = await http
+        .post(
+          Uri.parse('$kApiBase/pets'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body: jsonEncode(body),
+        )
+        .timeout(_timeout, onTimeout: () => throw PetException(_timeoutMsg));
     if (response.statusCode == 201) {
       return Pet.fromJson(jsonDecode(response.body) as Map<String, dynamic>);
     }
@@ -91,22 +104,29 @@ class PetService {
   }
 
   Future<void> deletarPet(int petId, String token) async {
-    final response = await http.delete(
-      Uri.parse('$kApiBase/pets/$petId'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
+    final response = await http
+        .delete(
+          Uri.parse('$kApiBase/pets/$petId'),
+          headers: {'Authorization': 'Bearer $token'},
+        )
+        .timeout(_timeout, onTimeout: () => throw PetException(_timeoutMsg));
     if (response.statusCode == 204) return;
     throw PetException(_extrairDetalhe(response.body, 'Erro ao remover pet'));
   }
 
-  Future<List<InteressadoInfo>> listarInteressados(int petId, String token) async {
-    final response = await http.get(
-      Uri.parse('$kApiBase/pets/$petId/interessados'),
-      headers: {'Authorization': 'Bearer $token'},
-    );
+  Future<List<InteressadoInfo>> listarInteressados(
+      int petId, String token) async {
+    final response = await http
+        .get(
+          Uri.parse('$kApiBase/pets/$petId/interessados'),
+          headers: {'Authorization': 'Bearer $token'},
+        )
+        .timeout(_timeout, onTimeout: () => throw PetException(_timeoutMsg));
     if (response.statusCode == 200) {
       final List<dynamic> data = jsonDecode(response.body);
-      return data.map((j) => InteressadoInfo.fromJson(j as Map<String, dynamic>)).toList();
+      return data
+          .map((j) => InteressadoInfo.fromJson(j as Map<String, dynamic>))
+          .toList();
     }
     throw PetException('Erro ao carregar interessados');
   }
