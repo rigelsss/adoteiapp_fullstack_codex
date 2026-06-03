@@ -59,25 +59,41 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  void _voltarParaSplash() {
+    context.go('/');
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9BC62),
-      body: SafeArea(
-        child: LayoutBuilder(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _voltarParaSplash();
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF9BC62),
+        body: LayoutBuilder(
           builder: (context, constraints) {
             final width = constraints.maxWidth;
             final height = constraints.maxHeight;
+            final topInset = MediaQuery.of(context).padding.top;
+            final topBarHeight = topInset + 40.0;
 
             return Stack(
               children: [
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    width * 0.05,
-                    height * 0.09,
-                    width * 0.05,
-                    0,
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: _LoginTopBar(
+                    topInset: topInset,
+                    onBack: _voltarParaSplash,
                   ),
+                ),
+                Positioned(
+                  top: topBarHeight - 12,
+                  left: width * 0.05,
+                  right: width * 0.05,
                   child: const _LoginHero(),
                 ),
                 Positioned(
@@ -188,41 +204,85 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
+class _LoginTopBar extends StatelessWidget {
+  final double topInset;
+  final VoidCallback onBack;
+
+  const _LoginTopBar({
+    required this.topInset,
+    required this.onBack,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(12, topInset + 4, 12, 0),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onBack,
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.black,
+                size: 20,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _LoginHero extends StatelessWidget {
   const _LoginHero();
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        const Align(
-          alignment: Alignment.topLeft,
-          child: Padding(
-            padding: EdgeInsets.only(top: 38),
-            child: _OutlinedHeading(text: 'Bem vindo\nde volta!'),
-          ),
-        ),
-        Positioned(
-          top: -2,
-          right: -4,
-          child: SizedBox(
-            width: 190,
-            height: 230,
-            child: Stack(
-              children: const [
-                _PawPrint(top: 0, right: 0, size: 43, angle: 0.32),
-                _PawPrint(top: 14, right: 48, size: 43, angle: -0.32),
-                _PawPrint(top: 56, right: 22, size: 43, angle: 0.32),
-                _PawPrint(top: 70, right: 74, size: 43, angle: -0.32),
-                _PawPrint(top: 112, right: 0, size: 43, angle: 0.32),
-                _PawPrint(top: 126, right: 48, size: 43, angle: -0.32),
-                _PawPrint(top: 168, right: 22, size: 43, angle: 0.32),
-                _PawPrint(top: 182, right: 74, size: 43, angle: -0.32),
-              ],
+    return SizedBox(
+      height: 250,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          const Align(
+            alignment: Alignment.topLeft,
+            child: Padding(
+              padding: EdgeInsets.only(top: 48),
+              child: _OutlinedHeading(text: 'Bem vindo\nde volta!'),
             ),
           ),
-        ),
-      ],
+          Positioned(
+            top: -18,
+            right: -4,
+            child: SizedBox(
+              width: 190,
+              height: 250,
+              child: Stack(
+                children: const [
+                  _PawPrint(top: 0, right: 0, size: 43, angle: 0.32),
+                  _PawPrint(top: 14, right: 48, size: 43, angle: -0.32),
+                  _PawPrint(top: 56, right: 22, size: 43, angle: 0.32),
+                  _PawPrint(top: 70, right: 74, size: 43, angle: -0.32),
+                  _PawPrint(top: 112, right: 0, size: 43, angle: 0.32),
+                  _PawPrint(top: 126, right: 48, size: 43, angle: -0.32),
+                  _PawPrint(top: 168, right: 22, size: 43, angle: 0.32),
+                  _PawPrint(top: 182, right: 74, size: 43, angle: -0.32),
+                ],
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
