@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
 import '../core/constants.dart';
 import '../providers/auth_provider.dart';
 
@@ -12,16 +13,11 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _RegisterScreenState extends State<RegisterScreen> {
-  final _pageCtrl = PageController();
-  int _page = 0;
+  static const _perguntaSeguranca = 'Qual o nome do seu primeiro pet?';
 
-  // Step 1
   final _nomeCtrl = TextEditingController();
   final _sobrenomeCtrl = TextEditingController();
-  final _perguntaCtrl = TextEditingController();
   final _respostaCtrl = TextEditingController();
-
-  // Step 2
   final _emailCtrl = TextEditingController();
   final _senhaCtrl = TextEditingController();
   final _confirmarCtrl = TextEditingController();
@@ -32,10 +28,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   void dispose() {
-    _pageCtrl.dispose();
     _nomeCtrl.dispose();
     _sobrenomeCtrl.dispose();
-    _perguntaCtrl.dispose();
     _respostaCtrl.dispose();
     _emailCtrl.dispose();
     _senhaCtrl.dispose();
@@ -43,29 +37,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _irParaStep2() {
+  Future<void> _cadastrar() async {
     if (_nomeCtrl.text.trim().isEmpty ||
         _sobrenomeCtrl.text.trim().isEmpty ||
-        _perguntaCtrl.text.trim().isEmpty ||
-        _respostaCtrl.text.trim().isEmpty) {
-      _showError('Preencha todos os campos');
-      return;
-    }
-    _pageCtrl.nextPage(duration: const Duration(milliseconds: 300), curve: Curves.easeInOut);
-    setState(() => _page = 1);
-  }
-
-  Future<void> _cadastrar() async {
-    if (_emailCtrl.text.trim().isEmpty ||
+        _respostaCtrl.text.trim().isEmpty ||
+        _emailCtrl.text.trim().isEmpty ||
         _senhaCtrl.text.isEmpty ||
         _confirmarCtrl.text.isEmpty) {
       _showError('Preencha todos os campos');
       return;
     }
+
     if (_senhaCtrl.text != _confirmarCtrl.text) {
       _showError('As senhas não coincidem');
       return;
     }
+
     setState(() => _loading = true);
     try {
       await context.read<AuthProvider>().register(
@@ -73,7 +60,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             sobrenome: _sobrenomeCtrl.text.trim(),
             email: _emailCtrl.text.trim(),
             senha: _senhaCtrl.text,
-            perguntaSeguranca: _perguntaCtrl.text.trim(),
+            perguntaSeguranca: _perguntaSeguranca,
             respostaSeguranca: _respostaCtrl.text.trim(),
           );
       if (mounted) context.go('/home');
@@ -90,172 +77,219 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
+  void _voltarParaLogin() {
+    context.go('/login');
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
-      canPop: _page == 0,
+      canPop: false,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop && _page == 1) {
-          _pageCtrl.previousPage(
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut,
-          );
-          setState(() => _page = 0);
-        }
+        if (!didPop) _voltarParaLogin();
       },
       child: Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Conteúdo em páginas
-            Expanded(
-              child: PageView(
-                controller: _pageCtrl,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [_buildStep1(), _buildStep2()],
+        backgroundColor: const Color(0xFFF9BC62),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            final height = constraints.maxHeight;
+            final topInset = MediaQuery.of(context).padding.top;
+
+            return Stack(
+              children: [
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: _RegisterTopBar(
+                    topInset: topInset,
+                    onBack: _voltarParaLogin,
+                  ),
+                ),
+                Positioned(
+                  top: topInset + 36,
+                  left: width * 0.05,
+                  right: width * 0.05,
+                  child: const _RegisterHero(),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    height: height * 0.72,
+                    padding: EdgeInsets.fromLTRB(
+                      width * 0.05,
+                      26,
+                      width * 0.05,
+                      24,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF4F4F4),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(34)),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const _FieldLabel('Nome'),
+                          const SizedBox(height: 8),
+                          _InputField(controller: _nomeCtrl),
+                          const SizedBox(height: 14),
+                          const _FieldLabel('Sobrenome'),
+                          const SizedBox(height: 8),
+                          _InputField(controller: _sobrenomeCtrl),
+                          const SizedBox(height: 14),
+                          const _FieldLabel('Email'),
+                          const SizedBox(height: 8),
+                          _InputField(
+                            controller: _emailCtrl,
+                            keyboardType: TextInputType.emailAddress,
+                          ),
+                          const SizedBox(height: 14),
+                          const _FieldLabel('Pergunta de segurança'),
+                          const SizedBox(height: 8),
+                          const Padding(
+                            padding: EdgeInsets.only(left: 10),
+                            child: Text(
+                              _perguntaSeguranca,
+                              style: TextStyle(
+                                fontFamily: 'AdigianaUI',
+                                fontSize: 16,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          _InputField(controller: _respostaCtrl),
+                          const SizedBox(height: 14),
+                          const _FieldLabel('Senha'),
+                          const SizedBox(height: 8),
+                          _InputField(
+                            controller: _senhaCtrl,
+                            obscureText: _obscureSenha,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureSenha ? Icons.visibility_off : Icons.visibility,
+                                color: AppColors.blue,
+                              ),
+                              onPressed: () {
+                                setState(() => _obscureSenha = !_obscureSenha);
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          const _FieldLabel('Confirmar senha'),
+                          const SizedBox(height: 8),
+                          _InputField(
+                            controller: _confirmarCtrl,
+                            obscureText: _obscureConfirmar,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureConfirmar ? Icons.visibility_off : Icons.visibility,
+                                color: AppColors.blue,
+                              ),
+                              onPressed: () {
+                                setState(() => _obscureConfirmar = !_obscureConfirmar);
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 22),
+                          _PrimaryActionButton(
+                            label: 'Criar conta',
+                            onPressed: _loading ? null : _cadastrar,
+                            loading: _loading,
+                          ),
+                          const SizedBox(height: 14),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _RegisterTopBar extends StatelessWidget {
+  final double topInset;
+  final VoidCallback onBack;
+
+  const _RegisterTopBar({
+    required this.topInset,
+    required this.onBack,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.fromLTRB(12, topInset + 4, 12, 0),
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onBack,
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.18),
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: const Icon(
+                Icons.arrow_back_ios_new_rounded,
+                color: Colors.black,
+                size: 20,
               ),
             ),
-            // Navegação
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _NavButton(
-                    icon: Icons.arrow_back,
-                    onTap: _page == 0
-                        ? () => context.go('/login')
-                        : () {
-                            _pageCtrl.previousPage(
-                                duration: const Duration(milliseconds: 300),
-                                curve: Curves.easeInOut);
-                            setState(() => _page = 0);
-                          },
-                  ),
-                  // Dots
-                  Row(
-                    children: List.generate(2, (i) => _Dot(active: _page == i)),
-                  ),
-                  _page == 0
-                      ? _NavButton(icon: Icons.arrow_forward, onTap: _irParaStep2)
-                      : _NavButton(
-                          icon: _loading ? null : Icons.check,
-                          onTap: _loading ? () {} : _cadastrar,
-                          loading: _loading,
-                        ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RegisterHero extends StatelessWidget {
+  const _RegisterHero();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 210,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          const Align(
+            alignment: Alignment.topLeft,
+            child: Padding(
+              padding: EdgeInsets.only(top: 36),
+              child: _OutlinedHeading(text: 'Crie sua\nconta'),
+            ),
+          ),
+          Positioned(
+            top: -4,
+            right: -4,
+            child: SizedBox(
+              width: 190,
+              height: 210,
+              child: Stack(
+                children: const [
+                  _PawPrint(top: 0, right: 0, size: 43, angle: 0.32),
+                  _PawPrint(top: 14, right: 48, size: 43, angle: -0.32),
+                  _PawPrint(top: 56, right: 22, size: 43, angle: 0.32),
+                  _PawPrint(top: 70, right: 74, size: 43, angle: -0.32),
+                  _PawPrint(top: 112, right: 0, size: 43, angle: 0.32),
+                  _PawPrint(top: 126, right: 48, size: 43, angle: -0.32),
                 ],
               ),
             ),
-            // Logo rodapé
-            Padding(
-              padding: const EdgeInsets.only(bottom: 24),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                decoration: BoxDecoration(
-                  color: AppColors.blue,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Text('Adotei',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w900,
-                            fontSize: 22)),
-                    SizedBox(width: 8),
-                    Icon(Icons.pets, color: AppColors.orange, size: 20),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ),   // Scaffold
-    );   // PopScope
-  }
-
-  Widget _buildStep1() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(28, 40, 28, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Crie sua\nConta',
-            style: TextStyle(
-              fontSize: 38,
-              fontWeight: FontWeight.w900,
-              color: AppColors.orange,
-              height: 1.1,
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'Você está a poucos passos de\nencontrar seu novo melhor amigo!',
-            style: TextStyle(color: Colors.grey, fontSize: 15),
-          ),
-          const SizedBox(height: 32),
-          _Label('Nome'),
-          _Field(controller: _nomeCtrl),
-          const SizedBox(height: 20),
-          _Label('Sobrenome'),
-          _Field(controller: _sobrenomeCtrl),
-          const SizedBox(height: 20),
-          _Label('Pergunta de segurança'),
-          _Field(
-            controller: _perguntaCtrl,
-            hint: 'Ex: Nome do seu primeiro pet?',
-          ),
-          const SizedBox(height: 20),
-          _Label('Resposta'),
-          _Field(controller: _respostaCtrl),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStep2() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(28, 40, 28, 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            'Crie sua\nConta',
-            style: TextStyle(
-              fontSize: 38,
-              fontWeight: FontWeight.w900,
-              color: AppColors.orange,
-              height: 1.1,
-            ),
-          ),
-          const SizedBox(height: 32),
-          _Label('Email'),
-          _Field(controller: _emailCtrl, keyboardType: TextInputType.emailAddress),
-          const SizedBox(height: 20),
-          _Label('Senha'),
-          _Field(
-            controller: _senhaCtrl,
-            obscureText: _obscureSenha,
-            suffixIcon: IconButton(
-              icon: Icon(_obscureSenha ? Icons.visibility_off : Icons.visibility,
-                  color: AppColors.blue),
-              onPressed: () => setState(() => _obscureSenha = !_obscureSenha),
-            ),
-          ),
-          const SizedBox(height: 20),
-          _Label('Confirmar senha'),
-          _Field(
-            controller: _confirmarCtrl,
-            obscureText: _obscureConfirmar,
-            suffixIcon: IconButton(
-              icon: Icon(_obscureConfirmar ? Icons.visibility_off : Icons.visibility,
-                  color: AppColors.blue),
-              onPressed: () => setState(() => _obscureConfirmar = !_obscureConfirmar),
-            ),
           ),
         ],
       ),
@@ -263,32 +297,68 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 }
 
-// ── Widgets locais ──────────────────────────────────────────────────────────
-
-class _Label extends StatelessWidget {
+class _OutlinedHeading extends StatelessWidget {
   final String text;
-  const _Label(this.text);
+
+  const _OutlinedHeading({required this.text});
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.only(bottom: 8),
-        child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-      );
+  Widget build(BuildContext context) {
+    const style = TextStyle(
+      fontFamily: 'AdigianaUI',
+      fontSize: 52,
+      fontWeight: FontWeight.w400,
+      height: 1.0,
+      color: Colors.white,
+    );
+
+    return Stack(
+      children: [
+        Text(
+          text,
+          style: style.copyWith(
+            foreground: Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 6
+              ..color = const Color(0xFF8E8E8E),
+          ),
+        ),
+        Text(text, style: style),
+      ],
+    );
+  }
 }
 
-class _Field extends StatelessWidget {
+class _FieldLabel extends StatelessWidget {
+  final String text;
+
+  const _FieldLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontFamily: 'AdigianaUI',
+        fontSize: 16,
+        fontWeight: FontWeight.normal,
+        color: Colors.black,
+      ),
+    );
+  }
+}
+
+class _InputField extends StatelessWidget {
   final TextEditingController controller;
   final bool obscureText;
   final TextInputType? keyboardType;
   final Widget? suffixIcon;
-  final String? hint;
 
-  const _Field({
+  const _InputField({
     required this.controller,
     this.obscureText = false,
     this.keyboardType,
     this.suffixIcon,
-    this.hint,
   });
 
   @override
@@ -296,12 +366,13 @@ class _Field extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFF6BC7F4), width: 2.5),
+        boxShadow: const [
           BoxShadow(
-            color: AppColors.blue.withValues(alpha: 0.2),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            color: Color(0xFF8ED5F4),
+            offset: Offset(5, 5),
+            blurRadius: 0,
           ),
         ],
       ),
@@ -309,11 +380,13 @@ class _Field extends StatelessWidget {
         controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,
+        style: const TextStyle(
+          fontFamily: 'AdigianaUI',
+          fontSize: 16,
+        ),
         decoration: InputDecoration(
           border: InputBorder.none,
-          hintText: hint,
-          hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           suffixIcon: suffixIcon,
         ),
       ),
@@ -321,45 +394,99 @@ class _Field extends StatelessWidget {
   }
 }
 
-class _NavButton extends StatelessWidget {
-  final IconData? icon;
-  final VoidCallback onTap;
+class _PrimaryActionButton extends StatelessWidget {
+  final String label;
+  final VoidCallback? onPressed;
   final bool loading;
 
-  const _NavButton({required this.icon, required this.onTap, this.loading = false});
+  const _PrimaryActionButton({
+    required this.label,
+    required this.onPressed,
+    this.loading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: 52,
-        height: 52,
-        decoration: const BoxDecoration(color: AppColors.orange, shape: BoxShape.circle),
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0xFF7CC6EA),
+            offset: Offset(5, 5),
+            blurRadius: 0,
+          ),
+        ],
+      ),
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFFF9BC62),
+          foregroundColor: Colors.white,
+          disabledBackgroundColor: const Color(0xFFF9BC62),
+          disabledForegroundColor: Colors.white,
+          elevation: 0,
+          minimumSize: const Size(double.infinity, 56),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
+        ),
         child: loading
-            ? const Padding(
-                padding: EdgeInsets.all(14),
-                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
               )
-            : Icon(icon, color: Colors.white),
+            : Text(
+                label,
+                style: const TextStyle(
+                  fontFamily: 'AdigianaUI',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
       ),
     );
   }
 }
 
-class _Dot extends StatelessWidget {
-  final bool active;
-  const _Dot({required this.active});
+class _PawPrint extends StatelessWidget {
+  final double top;
+  final double right;
+  final double size;
+  final double angle;
+
+  const _PawPrint({
+    required this.top,
+    required this.right,
+    required this.size,
+    required this.angle,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 4),
-      width: active ? 12 : 8,
-      height: active ? 12 : 8,
-      decoration: BoxDecoration(
-        color: active ? AppColors.blue : Colors.grey.shade300,
-        shape: BoxShape.circle,
+    return Positioned(
+      top: top,
+      right: right,
+      child: Transform.rotate(
+        angle: angle,
+        child: Stack(
+          children: [
+            Icon(
+              Icons.pets,
+              size: size,
+              color: const Color(0xFF6BC7F4),
+            ),
+            Icon(
+              Icons.pets,
+              size: size - 4,
+              color: Colors.white,
+            ),
+          ],
+        ),
       ),
     );
   }
