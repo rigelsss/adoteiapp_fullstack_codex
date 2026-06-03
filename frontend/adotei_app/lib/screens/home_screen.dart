@@ -11,10 +11,10 @@ import '../providers/pet_provider.dart';
 
 const _kEspecies = [
   {'label': 'Todos', 'valor': null, 'icon': Icons.menu},
-  {'label': 'Cão', 'valor': 'cão', 'icon': Icons.pets},
-  {'label': 'Gato', 'valor': 'gato', 'icon': Icons.catching_pokemon},
-  {'label': 'Coelho', 'valor': 'coelho', 'icon': Icons.cruelty_free},
-  {'label': 'Pássaro', 'valor': 'pássaro', 'icon': Icons.flutter_dash},
+  {'label': 'Cão', 'valor': 'cão', 'assetIcon': 'assets/icons/patas.png'},
+  {'label': 'Gato', 'valor': 'gato', 'assetIcon': 'assets/icons/gato-preto.png'},
+  {'label': 'Coelho', 'valor': 'coelho', 'assetIcon': 'assets/icons/coelho.png'},
+  {'label': 'Pássaro', 'valor': 'pássaro', 'assetIcon': 'assets/icons/passaro.png'},
   {'label': 'Outro', 'valor': 'outro', 'icon': Icons.more_horiz},
 ];
 
@@ -71,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return PopScope(
       canPop: false,
       child: Scaffold(
-        backgroundColor: AppColors.background,
+        backgroundColor: Colors.white,
         appBar: _buildAppBar(auth),
         floatingActionButton: auth.isAuthenticated
             ? FloatingActionButton(
@@ -110,7 +110,9 @@ class _HomeScreenState extends State<HomeScreen> {
   AppBar _buildAppBar(AuthProvider auth) {
     return AppBar(
       backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
       elevation: 0,
+      scrolledUnderElevation: 0,
       title: Row(
         children: [
           const Icon(Icons.pets, color: AppColors.orange),
@@ -127,6 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
             padding: const EdgeInsets.only(right: 8),
             child: PopupMenuButton<String>(
               offset: const Offset(0, 48),
+              color: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               onSelected: (value) async {
                 if (value == 'perfil') {
@@ -219,7 +222,8 @@ class _HomeScreenState extends State<HomeScreen> {
               final selected = pets.filtroEspecie == e['valor'];
               return _EspecieChip(
                 label: e['label'] as String,
-                icon: e['icon'] as IconData,
+                icon: e['icon'] as IconData?,
+                assetIcon: e['assetIcon'] as String?,
                 selected: selected,
                 onTap: () => pets.setFiltroEspecie(e['valor'] as String?),
               );
@@ -245,13 +249,15 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _EspecieChip extends StatelessWidget {
   final String label;
-  final IconData icon;
+  final IconData? icon;
+  final String? assetIcon;
   final bool selected;
   final VoidCallback onTap;
 
   const _EspecieChip({
     required this.label,
-    required this.icon,
+    this.icon,
+    this.assetIcon,
     required this.selected,
     required this.onTap,
   });
@@ -268,7 +274,14 @@ class _EspecieChip extends StatelessWidget {
             CircleAvatar(
               radius: 26,
               backgroundColor: selected ? AppColors.orange : AppColors.blue,
-              child: Icon(icon, color: Colors.white, size: 22),
+              child: assetIcon != null
+                  ? Image.asset(
+                      assetIcon!,
+                      width: 24,
+                      height: 24,
+                      color: Colors.white,
+                    )
+                  : Icon(icon, color: Colors.white, size: 22),
             ),
             const SizedBox(height: 4),
             Text(
