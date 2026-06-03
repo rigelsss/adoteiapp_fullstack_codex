@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../core/constants.dart';
 import '../providers/auth_provider.dart';
-import '../services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -78,8 +77,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             respostaSeguranca: _respostaCtrl.text.trim(),
           );
       if (mounted) context.go('/home');
-    } on AuthException catch (e) {
-      if (mounted) _showError(e.message);
+    } catch (e) {
+      if (mounted) _showError(e.toString());
     } finally {
       if (mounted) setState(() => _loading = false);
     }

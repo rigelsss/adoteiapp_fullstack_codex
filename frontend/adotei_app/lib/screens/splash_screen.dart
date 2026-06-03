@@ -32,7 +32,7 @@ class _SplashScreenState extends State<SplashScreen> {
           builder: (context, constraints) {
             final width = constraints.maxWidth;
             final height = constraints.maxHeight;
-            final topSectionHeight = height * 0.63;
+            final topSectionHeight = height * 0.70;
             final logoTopPadding = height * 0.075;
 
             return Stack(

@@ -36,8 +36,8 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await context.read<AuthProvider>().login(email, senha);
       if (mounted) context.go('/home');
-    } on AuthException catch (e) {
-      if (mounted) _showError(e.message);
+    } catch (e) {
+      if (mounted) _showError(e.toString());
     } finally {
       if (mounted) setState(() => _loading = false);
     }
