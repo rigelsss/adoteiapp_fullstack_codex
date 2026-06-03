@@ -319,7 +319,7 @@ class _ProximosSection extends StatelessWidget {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
             SizedBox(
-              height: 180,
+              height: 186,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -516,10 +516,10 @@ class _PetCardHorizontal extends StatelessWidget {
           children: [
             ClipRRect(
               borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-              child: _PetImage(fotoUrl: pet.fotoUrl, size: 130, radius: 0),
+              child: _PetImage(fotoUrl: pet.fotoUrl, size: 122, radius: 0),
             ),
             Padding(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.fromLTRB(8, 7, 8, 6),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
