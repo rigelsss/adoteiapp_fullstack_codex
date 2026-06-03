@@ -119,17 +119,19 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   bottom: 0,
                   child: Container(
                     height: height * 0.72,
-                    padding: EdgeInsets.fromLTRB(
-                      width * 0.05,
-                      26,
-                      width * 0.05,
-                      24,
-                    ),
+                    clipBehavior: Clip.antiAlias,
                     decoration: const BoxDecoration(
                       color: Color(0xFFF4F4F4),
                       borderRadius: BorderRadius.vertical(top: Radius.circular(34)),
                     ),
                     child: SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      padding: EdgeInsets.fromLTRB(
+                        width * 0.05,
+                        26,
+                        width * 0.05,
+                        24,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
