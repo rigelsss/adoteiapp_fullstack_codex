@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+
 import '../core/constants.dart';
 import '../providers/auth_provider.dart';
 import '../services/auth_service.dart';
@@ -53,251 +54,229 @@ class _LoginScreenState extends State<LoginScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
+      backgroundColor: Colors.transparent,
       builder: (_) => const _RecuperarSenhaSheet(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height;
-
     return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            // Cabeçalho laranja
-            Container(
-              height: height * 0.42,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: AppColors.orange,
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(40)),
-              ),
-              child: SafeArea(
-                child: Stack(
-                  children: [
-                    // Patinhas decorativas
-                    const Positioned(top: 16, right: 24, child: _Paw(size: 40, opacity: 0.5)),
-                    const Positioned(top: 50, right: 64, child: _Paw(size: 32, opacity: 0.4)),
-                    const Positioned(top: 80, right: 32, child: _Paw(size: 28, opacity: 0.3)),
-                    const Positioned(top: 110, right: 70, child: _Paw(size: 24, opacity: 0.3)),
-                    // Texto
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(28, 32, 28, 0),
+      backgroundColor: const Color(0xFFF9BC62),
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final width = constraints.maxWidth;
+            final height = constraints.maxHeight;
+
+            return Stack(
+              children: [
+                Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    width * 0.05,
+                    height * 0.09,
+                    width * 0.05,
+                    0,
+                  ),
+                  child: const _LoginHero(),
+                ),
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  child: Container(
+                    height: height * 0.63,
+                    padding: EdgeInsets.fromLTRB(
+                      width * 0.05,
+                      32,
+                      width * 0.05,
+                      24,
+                    ),
+                    decoration: const BoxDecoration(
+                      color: Color(0xFFF4F4F4),
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(34)),
+                    ),
+                    child: SingleChildScrollView(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'Bem-\nvindo de\nvolta!',
-                            style: TextStyle(
-                              fontSize: 36,
-                              fontWeight: FontWeight.w900,
-                              color: Colors.white,
-                              height: 1.15,
+                        children: [
+                          const _FieldLabel('Email'),
+                          const SizedBox(height: 10),
+                          _InputField(
+                            controller: _emailCtrl,
+                            keyboardType: TextInputType.emailAddress,
+                          ),
+                          const SizedBox(height: 26),
+                          const _FieldLabel('Senha'),
+                          const SizedBox(height: 10),
+                          _InputField(
+                            controller: _senhaCtrl,
+                            obscureText: _obscureSenha,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscureSenha ? Icons.visibility_off : Icons.visibility,
+                                color: AppColors.blue,
+                              ),
+                              onPressed: () {
+                                setState(() => _obscureSenha = !_obscureSenha);
+                              },
                             ),
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: _abrirRecuperarSenha,
+                              child: const Text(
+                                'Esqueci minha senha',
+                                style: TextStyle(
+                                  fontFamily: 'AdigianaUI',
+                                  color: AppColors.blue,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.normal,
+                                  decoration: TextDecoration.underline,
+                                  decorationColor: AppColors.blue,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                          _PrimaryActionButton(
+                            label: 'Entrar',
+                            onPressed: _loading ? null : _login,
+                            loading: _loading,
+                          ),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Text(
+                                'Não tem conta? ',
+                                style: TextStyle(
+                                  fontFamily: 'AdigianaUI',
+                                  color: Colors.black87,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.normal,
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () => context.push('/register'),
+                                child: const Text(
+                                  'Criar conta',
+                                  style: TextStyle(
+                                    fontFamily: 'AdigianaUI',
+                                    color: AppColors.blue,
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.normal,
+                                    decoration: TextDecoration.underline,
+                                    decorationColor: AppColors.blue,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-            // Card de formulário
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 28, 24, 32),
-              child: Container(
-                padding: const EdgeInsets.all(28),
-                decoration: BoxDecoration(
-                  color: AppColors.background,
-                  borderRadius: BorderRadius.circular(24),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text('Email', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                    const SizedBox(height: 8),
-                    _InputField(controller: _emailCtrl, keyboardType: TextInputType.emailAddress),
-                    const SizedBox(height: 20),
-                    const Text('Senha', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                    const SizedBox(height: 8),
-                    _InputField(
-                      controller: _senhaCtrl,
-                      obscureText: _obscureSenha,
-                      suffixIcon: IconButton(
-                        icon: Icon(_obscureSenha ? Icons.visibility_off : Icons.visibility,
-                            color: AppColors.blue),
-                        onPressed: () => setState(() => _obscureSenha = !_obscureSenha),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: _abrirRecuperarSenha,
-                        child: const Text(
-                          'Esqueci minha senha',
-                          style: TextStyle(color: AppColors.blue),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 52,
-                      child: ElevatedButton(
-                        onPressed: _loading ? null : _login,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.orange,
-                          foregroundColor: Colors.white,
-                          shape: const StadiumBorder(),
-                        ),
-                        child: _loading
-                            ? const SizedBox(width: 22, height: 22,
-                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                            : const Text('Entrar',
-                                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text('Não tem conta? '),
-                        GestureDetector(
-                          onTap: () => context.push('/register'),
-                          child: const Text(
-                            'Criar conta',
-                            style: TextStyle(color: AppColors.blue, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
+              ],
+            );
+          },
         ),
       ),
     );
   }
 }
 
-// ── Recuperar senha (bottom sheet) ─────────────────────────────────────────
-
-class _RecuperarSenhaSheet extends StatefulWidget {
-  const _RecuperarSenhaSheet();
-
-  @override
-  State<_RecuperarSenhaSheet> createState() => _RecuperarSenhaSheetState();
-}
-
-class _RecuperarSenhaSheetState extends State<_RecuperarSenhaSheet> {
-  final _service = AuthService();
-  final _emailCtrl = TextEditingController();
-  final _respostaCtrl = TextEditingController();
-  final _novaSenhaCtrl = TextEditingController();
-
-  int _step = 0; // 0: email, 1: pergunta+nova senha
-  String _pergunta = '';
-  bool _loading = false;
-
-  @override
-  void dispose() {
-    _emailCtrl.dispose();
-    _respostaCtrl.dispose();
-    _novaSenhaCtrl.dispose();
-    super.dispose();
-  }
-
-  Future<void> _buscarPergunta() async {
-    setState(() => _loading = true);
-    try {
-      final p = await _service.getPerguntaSeguranca(_emailCtrl.text.trim());
-      setState(() { _pergunta = p; _step = 1; });
-    } on AuthException catch (e) {
-      _showError(e.message);
-    } finally {
-      setState(() => _loading = false);
-    }
-  }
-
-  Future<void> _redefinir() async {
-    setState(() => _loading = true);
-    try {
-      await _service.redefinirSenha(
-        email: _emailCtrl.text.trim(),
-        resposta: _respostaCtrl.text.trim(),
-        novaSenha: _novaSenhaCtrl.text,
-      );
-      if (mounted) {
-        Navigator.pop(context);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Senha redefinida com sucesso!'), backgroundColor: Colors.green),
-        );
-      }
-    } on AuthException catch (e) {
-      _showError(e.message);
-    } finally {
-      if (mounted) setState(() => _loading = false);
-    }
-  }
-
-  void _showError(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(msg), backgroundColor: Colors.redAccent),
-    );
-  }
+class _LoginHero extends StatelessWidget {
+  const _LoginHero();
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.fromLTRB(24, 24, 24,
-          MediaQuery.of(context).viewInsets.bottom + 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text('Recuperar senha',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 20),
-          if (_step == 0) ...[
-            const Text('Email', style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            _InputField(controller: _emailCtrl, keyboardType: TextInputType.emailAddress),
-            const SizedBox(height: 16),
-            _BotaoPrimario(label: 'Continuar', onTap: _buscarPergunta, loading: _loading),
-          ] else ...[
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.blue.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(_pergunta, style: const TextStyle(fontSize: 15)),
+    return Stack(
+      children: [
+        const Align(
+          alignment: Alignment.topLeft,
+          child: Padding(
+            padding: EdgeInsets.only(top: 38),
+            child: _OutlinedHeading(text: 'Bem vindo\nde volta!'),
+          ),
+        ),
+        Positioned(
+          top: -2,
+          right: -4,
+          child: SizedBox(
+            width: 190,
+            height: 230,
+            child: Stack(
+              children: const [
+                _PawPrint(top: 0, right: 0, size: 43, angle: 0.32),
+                _PawPrint(top: 14, right: 48, size: 43, angle: -0.32),
+                _PawPrint(top: 56, right: 22, size: 43, angle: 0.32),
+                _PawPrint(top: 70, right: 74, size: 43, angle: -0.32),
+                _PawPrint(top: 112, right: 0, size: 43, angle: 0.32),
+                _PawPrint(top: 126, right: 48, size: 43, angle: -0.32),
+                _PawPrint(top: 168, right: 22, size: 43, angle: 0.32),
+                _PawPrint(top: 182, right: 74, size: 43, angle: -0.32),
+              ],
             ),
-            const SizedBox(height: 16),
-            const Text('Resposta', style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            _InputField(controller: _respostaCtrl),
-            const SizedBox(height: 16),
-            const Text('Nova senha', style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            _InputField(controller: _novaSenhaCtrl, obscureText: true),
-            const SizedBox(height: 16),
-            _BotaoPrimario(label: 'Redefinir senha', onTap: _redefinir, loading: _loading),
-          ],
-        ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _OutlinedHeading extends StatelessWidget {
+  final String text;
+
+  const _OutlinedHeading({required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    const style = TextStyle(
+      fontFamily: 'AdigianaUI',
+      fontSize: 52,
+      fontWeight: FontWeight.w400,
+      height: 1.0,
+      color: Colors.white,
+    );
+
+    return Stack(
+      children: [
+        Text(
+          text,
+          style: style.copyWith(
+            foreground: Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 6
+              ..color = const Color(0xFF8E8E8E),
+          ),
+        ),
+        Text(text, style: style),
+      ],
+    );
+  }
+}
+
+class _FieldLabel extends StatelessWidget {
+  final String text;
+
+  const _FieldLabel(this.text);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: const TextStyle(
+        fontFamily: 'AdigianaUI',
+        fontSize: 18,
+        fontWeight: FontWeight.normal,
+        color: Colors.black,
       ),
     );
   }
 }
-
-// ── Widgets compartilhados ──────────────────────────────────────────────────
 
 class _InputField extends StatelessWidget {
   final TextEditingController controller;
@@ -317,12 +296,13 @@ class _InputField extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(30),
-        boxShadow: [
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: const Color(0xFF6BC7F4), width: 2.5),
+        boxShadow: const [
           BoxShadow(
-            color: AppColors.blue.withValues(alpha: 0.25),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
+            color: Color(0xFF8ED5F4),
+            offset: Offset(5, 5),
+            blurRadius: 0,
           ),
         ],
       ),
@@ -330,9 +310,13 @@ class _InputField extends StatelessWidget {
         controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,
+        style: const TextStyle(
+          fontFamily: 'AdigianaUI',
+          fontSize: 16,
+        ),
         decoration: InputDecoration(
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           suffixIcon: suffixIcon,
         ),
       ),
@@ -340,44 +324,260 @@ class _InputField extends StatelessWidget {
   }
 }
 
-class _BotaoPrimario extends StatelessWidget {
+class _PrimaryActionButton extends StatelessWidget {
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onPressed;
   final bool loading;
 
-  const _BotaoPrimario({required this.label, required this.onTap, this.loading = false});
+  const _PrimaryActionButton({
+    required this.label,
+    required this.onPressed,
+    this.loading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: 52,
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(22),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0xFF7CC6EA),
+            offset: Offset(5, 5),
+            blurRadius: 0,
+          ),
+        ],
+      ),
       child: ElevatedButton(
-        onPressed: loading ? null : onTap,
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.orange,
+          backgroundColor: const Color(0xFFF9BC62),
           foregroundColor: Colors.white,
-          shape: const StadiumBorder(),
+          disabledBackgroundColor: const Color(0xFFF9BC62),
+          disabledForegroundColor: Colors.white,
+          elevation: 0,
+          minimumSize: const Size(double.infinity, 56),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
         ),
         child: loading
-            ? const SizedBox(width: 22, height: 22,
-                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-            : Text(label, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            ? const SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+            : Text(
+                label,
+                style: const TextStyle(
+                  fontFamily: 'AdigianaUI',
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                ),
+              ),
       ),
     );
   }
 }
 
-class _Paw extends StatelessWidget {
+class _PawPrint extends StatelessWidget {
+  final double top;
+  final double right;
   final double size;
-  final double opacity;
-  const _Paw({required this.size, required this.opacity});
+  final double angle;
+
+  const _PawPrint({
+    required this.top,
+    required this.right,
+    required this.size,
+    required this.angle,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: opacity,
-      child: Icon(Icons.pets, size: size, color: Colors.white),
+    return Positioned(
+      top: top,
+      right: right,
+      child: Transform.rotate(
+        angle: angle,
+        child: Stack(
+          children: [
+            Icon(
+              Icons.pets,
+              size: size,
+              color: const Color(0xFF6BC7F4),
+            ),
+            Icon(
+              Icons.pets,
+              size: size - 4,
+              color: Colors.white,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _RecuperarSenhaSheet extends StatefulWidget {
+  const _RecuperarSenhaSheet();
+
+  @override
+  State<_RecuperarSenhaSheet> createState() => _RecuperarSenhaSheetState();
+}
+
+class _RecuperarSenhaSheetState extends State<_RecuperarSenhaSheet> {
+  final _service = AuthService();
+  final _emailCtrl = TextEditingController();
+  final _respostaCtrl = TextEditingController();
+  final _novaSenhaCtrl = TextEditingController();
+
+  int _step = 0;
+  String _pergunta = '';
+  bool _loading = false;
+
+  @override
+  void dispose() {
+    _emailCtrl.dispose();
+    _respostaCtrl.dispose();
+    _novaSenhaCtrl.dispose();
+    super.dispose();
+  }
+
+  Future<void> _buscarPergunta() async {
+    setState(() => _loading = true);
+    try {
+      final pergunta = await _service.getPerguntaSeguranca(_emailCtrl.text.trim());
+      setState(() {
+        _pergunta = pergunta;
+        _step = 1;
+      });
+    } on AuthException catch (e) {
+      _showError(e.message);
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  Future<void> _redefinir() async {
+    setState(() => _loading = true);
+    try {
+      await _service.redefinirSenha(
+        email: _emailCtrl.text.trim(),
+        resposta: _respostaCtrl.text.trim(),
+        novaSenha: _novaSenhaCtrl.text,
+      );
+      if (mounted) {
+        Navigator.pop(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Senha redefinida com sucesso!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } on AuthException catch (e) {
+      _showError(e.message);
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
+  void _showError(String msg) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(msg), backgroundColor: Colors.redAccent),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color(0xFFF4F4F4),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(
+          24,
+          24,
+          24,
+          MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 56,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.black12,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'Recuperar senha',
+              style: TextStyle(
+                fontFamily: 'AdigianaUI',
+                fontSize: 22,
+                fontWeight: FontWeight.w900,
+              ),
+            ),
+            const SizedBox(height: 20),
+            if (_step == 0) ...[
+              const _FieldLabel('Email'),
+              const SizedBox(height: 10),
+              _InputField(
+                controller: _emailCtrl,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              const SizedBox(height: 18),
+              _PrimaryActionButton(
+                label: 'Continuar',
+                onPressed: _loading ? null : _buscarPergunta,
+                loading: _loading,
+              ),
+            ] else ...[
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: AppColors.blue.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Text(
+                  _pergunta,
+                  style: const TextStyle(
+                    fontFamily: 'AdigianaUI',
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
+              const _FieldLabel('Resposta'),
+              const SizedBox(height: 10),
+              _InputField(controller: _respostaCtrl),
+              const SizedBox(height: 18),
+              const _FieldLabel('Nova senha'),
+              const SizedBox(height: 10),
+              _InputField(controller: _novaSenhaCtrl, obscureText: true),
+              const SizedBox(height: 18),
+              _PrimaryActionButton(
+                label: 'Redefinir senha',
+                onPressed: _loading ? null : _redefinir,
+                loading: _loading,
+              ),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

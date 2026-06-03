@@ -110,6 +110,7 @@ class _SplashScreenState extends State<SplashScreen> {
                               child: const Text(
                                 'Continuar como visitante',
                                 style: TextStyle(
+                                  fontFamily: 'AdigianaUI',
                                   color: AppColors.blue,
                                   fontSize: 15,
                                   fontWeight: FontWeight.w700,
@@ -156,10 +157,10 @@ class _BrandHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const _OutlinedLogoText(text: 'Adotei'),
-        const SizedBox(width: 10),
-        const _BrandBadge(),
+      children: const [
+        _OutlinedLogoText(text: 'Adotei'),
+        SizedBox(width: 10),
+        _BrandBadge(),
       ],
     );
   }
@@ -173,6 +174,7 @@ class _OutlinedLogoText extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const style = TextStyle(
+      fontFamily: 'AdigianaUI',
       fontSize: 54,
       fontWeight: FontWeight.w900,
       letterSpacing: 0.5,
@@ -266,6 +268,7 @@ class _PrimarySplashButton extends StatelessWidget {
         child: Text(
           label,
           style: const TextStyle(
+            fontFamily: 'AdigianaUI',
             fontSize: 18,
             fontWeight: FontWeight.w800,
           ),
