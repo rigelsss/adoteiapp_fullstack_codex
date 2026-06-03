@@ -93,7 +93,13 @@ class _SplashScreenState extends State<SplashScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             _PrimarySplashButton(
+                              label: 'Já tenho conta',
                               onPressed: () => context.push('/login'),
+                            ),
+                            const SizedBox(height: 14),
+                            _PrimarySplashButton(
+                              label: 'Criar conta',
+                              onPressed: () => context.push('/register'),
                             ),
                             const SizedBox(height: 18),
                             GestureDetector(
@@ -224,9 +230,13 @@ class _BrandBadge extends StatelessWidget {
 }
 
 class _PrimarySplashButton extends StatelessWidget {
+  final String label;
   final VoidCallback onPressed;
 
-  const _PrimarySplashButton({required this.onPressed});
+  const _PrimarySplashButton({
+    required this.label,
+    required this.onPressed,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -253,9 +263,9 @@ class _PrimarySplashButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(22),
           ),
         ),
-        child: const Text(
-          'Já tenho conta',
-          style: TextStyle(
+        child: Text(
+          label,
+          style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w800,
           ),
