@@ -126,7 +126,7 @@ def seed():
 
         Pet(nome="Simba", especie="gato", raca="Maine Coon", idade=14, porte="médio",
             descricao="Grande e peludo, muito manso. Adora colo e não arranha móveis.",
-            foto_url="https://images.unsplash.com/photo-1533743983669-94fa5c4338ec?w=400",
+            foto_url="https://images.unsplash.com/photo-1533743983669-94fa5c433ec?w=400",
             cidade="Campina Grande", estado="PB", dono_id=beatriz.id),
 
         Pet(nome="Branca", especie="coelho", raca="Angorá", idade=8, porte="pequeno",
