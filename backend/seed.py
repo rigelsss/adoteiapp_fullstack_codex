@@ -11,12 +11,30 @@ Base.metadata.create_all(bind=engine)
 
 SEED_EMAIL = "seed_ana@adotei.com"
 
+# Fotos corrigidas para pets cujo foto_url original não condizia com o animal
+# (ou estava quebrado). Aplicado mesmo quando o banco já foi semeado antes.
+FOTOS_CORRIGIDAS = {
+    "Coco": "https://images.unsplash.com/photo-1560595643-90bb555b2eaa?w=400",
+    "Branca": "https://images.unsplash.com/photo-1643010790410-191ffa19f58e?w=400",
+    "Goku": "https://images.unsplash.com/photo-1746738771486-72b9347302c4?w=400",
+    "Duque": "https://images.unsplash.com/photo-1608113240010-e76286118bf2?w=400",
+}
+
+
+def corrigir_fotos(db):
+    for nome, url in FOTOS_CORRIGIDAS.items():
+        pet = db.query(Pet).filter(Pet.nome == nome).first()
+        if pet and pet.foto_url != url:
+            pet.foto_url = url
+    db.commit()
+
 
 def seed():
     db = SessionLocal()
 
     if db.query(User).filter(User.email == SEED_EMAIL).first():
-        print("Banco já possui dados de seed. Delete adotei.db e rode novamente para recriar.")
+        print("Banco já possui dados de seed. Corrigindo fotos divergentes...")
+        corrigir_fotos(db)
         db.close()
         return
 
@@ -91,7 +109,7 @@ def seed():
 
         Pet(nome="Duque", especie="cão", raca="Beagle", idade=30, porte="médio",
             descricao="Adora farejar e explorar. Ótimo faro. Precisa de quintal.",
-            foto_url="https://images.unsplash.com/photo-1505628346881-b72b27e84530?w=400",
+            foto_url="https://images.unsplash.com/photo-1608113240010-e76286118bf2?w=400",
             cidade="Recife", estado="PE", dono_id=carlos.id),
 
         Pet(nome="Fifi", especie="cão", raca="Poodle", idade=60, porte="pequeno",
@@ -106,17 +124,17 @@ def seed():
 
         Pet(nome="Branca", especie="coelho", raca="Angorá", idade=8, porte="pequeno",
             descricao="Pelagem branca e macia. Muito tranquila. Ideal para apartamento.",
-            foto_url="https://images.unsplash.com/photo-1606574977634-5e04c2a0ccc8?w=400",
+            foto_url="https://images.unsplash.com/photo-1643010790410-191ffa19f58e?w=400",
             cidade="Caruaru", estado="PE", dono_id=carlos.id),
 
         Pet(nome="Goku", especie="cão", raca="Shiba Inu", idade=18, porte="médio",
             descricao="Independente e leal. Não se dá muito com estranhos mas ama a família.",
-            foto_url="https://images.unsplash.com/photo-1579213838058-a8bdf06b1da4?w=400",
+            foto_url="https://images.unsplash.com/photo-1746738771486-72b9347302c4?w=400",
             cidade="Recife", estado="PE", dono_id=carlos.id),
 
         Pet(nome="Coco", especie="pássaro", raca="Periquito", idade=12, porte="pequeno",
             descricao="Verde e amarelo, muito alegre. Canta o dia todo. Vem com gaiola.",
-            foto_url="https://images.unsplash.com/photo-1544923246-77307dd654cb?w=400",
+            foto_url="https://images.unsplash.com/photo-1560595643-90bb555b2eaa?w=400",
             cidade="Recife", estado="PE", dono_id=carlos.id),
     ]
 
