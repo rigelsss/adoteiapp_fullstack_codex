@@ -1,7 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(not exist *)"
+      "Bash(not exist *)",
+      "Bash(flutter devices *)",
+      "Bash(flutter analyze *)"
     ]
   }
 }

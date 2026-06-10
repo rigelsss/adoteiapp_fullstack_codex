@@ -14,6 +14,10 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   static const _perguntaSeguranca = 'Qual o nome do seu primeiro pet?';
+  static const _senhaMinLength = 6;
+  static final _emailRegex = RegExp(r'^[\w.+-]+@[\w-]+\.[\w.-]+$');
+
+  final _formKey = GlobalKey<FormState>();
 
   final _nomeCtrl = TextEditingController();
   final _sobrenomeCtrl = TextEditingController();
@@ -38,18 +42,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _cadastrar() async {
-    if (_nomeCtrl.text.trim().isEmpty ||
-        _sobrenomeCtrl.text.trim().isEmpty ||
-        _respostaCtrl.text.trim().isEmpty ||
-        _emailCtrl.text.trim().isEmpty ||
-        _senhaCtrl.text.isEmpty ||
-        _confirmarCtrl.text.isEmpty) {
-      _showError('Preencha todos os campos');
-      return;
-    }
-
-    if (_senhaCtrl.text != _confirmarCtrl.text) {
-      _showError('As senhas não coincidem');
+    if (!(_formKey.currentState?.validate() ?? false)) {
       return;
     }
 
@@ -79,6 +72,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   void _voltarParaLogin() {
     context.go('/login');
+  }
+
+  String? _validarObrigatorio(String? value, String mensagem) {
+    if (value == null || value.trim().isEmpty) {
+      return mensagem;
+    }
+    return null;
+  }
+
+  String? _validarEmail(String? value) {
+    final email = value?.trim() ?? '';
+    if (email.isEmpty) {
+      return 'Informe seu email';
+    }
+    if (!_emailRegex.hasMatch(email)) {
+      return 'Informe um email válido';
+    }
+    return null;
+  }
+
+  String? _validarSenha(String? value) {
+    final senha = value ?? '';
+    if (senha.isEmpty) {
+      return 'Informe uma senha';
+    }
+    if (senha.length < _senhaMinLength) {
+      return 'A senha deve ter pelo menos $_senhaMinLength caracteres';
+    }
+    return null;
+  }
+
+  String? _validarConfirmarSenha(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Confirme sua senha';
+    }
+    if (value != _senhaCtrl.text) {
+      return 'As senhas não coincidem';
+    }
+    return null;
   }
 
   @override
@@ -132,79 +164,97 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         width * 0.05,
                         24,
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const _FieldLabel('Nome'),
-                          const SizedBox(height: 8),
-                          _InputField(controller: _nomeCtrl),
-                          const SizedBox(height: 14),
-                          const _FieldLabel('Sobrenome'),
-                          const SizedBox(height: 8),
-                          _InputField(controller: _sobrenomeCtrl),
-                          const SizedBox(height: 14),
-                          const _FieldLabel('Email'),
-                          const SizedBox(height: 8),
-                          _InputField(
-                            controller: _emailCtrl,
-                            keyboardType: TextInputType.emailAddress,
-                          ),
-                          const SizedBox(height: 14),
-                          const _FieldLabel('Pergunta de segurança'),
-                          const SizedBox(height: 8),
-                          const Padding(
-                            padding: EdgeInsets.only(left: 10),
-                            child: Text(
-                              _perguntaSeguranca,
-                              style: TextStyle(
-                                fontFamily: 'AdigianaUI',
-                                fontSize: 16,
-                                color: Colors.black87,
+                      child: Form(
+                        key: _formKey,
+                        autovalidateMode: AutovalidateMode.onUserInteraction,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const _FieldLabel('Nome'),
+                            const SizedBox(height: 8),
+                            _InputField(
+                              controller: _nomeCtrl,
+                              validator: (v) => _validarObrigatorio(v, 'Informe seu nome'),
+                            ),
+                            const SizedBox(height: 14),
+                            const _FieldLabel('Sobrenome'),
+                            const SizedBox(height: 8),
+                            _InputField(
+                              controller: _sobrenomeCtrl,
+                              validator: (v) => _validarObrigatorio(v, 'Informe seu sobrenome'),
+                            ),
+                            const SizedBox(height: 14),
+                            const _FieldLabel('Email'),
+                            const SizedBox(height: 8),
+                            _InputField(
+                              controller: _emailCtrl,
+                              keyboardType: TextInputType.emailAddress,
+                              validator: _validarEmail,
+                            ),
+                            const SizedBox(height: 14),
+                            const _FieldLabel('Pergunta de segurança'),
+                            const SizedBox(height: 8),
+                            const Padding(
+                              padding: EdgeInsets.only(left: 10),
+                              child: Text(
+                                _perguntaSeguranca,
+                                style: TextStyle(
+                                  fontFamily: 'AdigianaUI',
+                                  fontSize: 16,
+                                  color: Colors.black87,
+                                ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 14),
-                          _InputField(controller: _respostaCtrl),
-                          const SizedBox(height: 14),
-                          const _FieldLabel('Senha'),
-                          const SizedBox(height: 8),
-                          _InputField(
-                            controller: _senhaCtrl,
-                            obscureText: _obscureSenha,
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureSenha ? Icons.visibility_off : Icons.visibility,
-                                color: AppColors.blue,
-                              ),
-                              onPressed: () {
-                                setState(() => _obscureSenha = !_obscureSenha);
-                              },
+                            const SizedBox(height: 14),
+                            _InputField(
+                              controller: _respostaCtrl,
+                              validator: (v) =>
+                                  _validarObrigatorio(v, 'Informe a resposta de segurança'),
                             ),
-                          ),
-                          const SizedBox(height: 14),
-                          const _FieldLabel('Confirmar senha'),
-                          const SizedBox(height: 8),
-                          _InputField(
-                            controller: _confirmarCtrl,
-                            obscureText: _obscureConfirmar,
-                            suffixIcon: IconButton(
-                              icon: Icon(
-                                _obscureConfirmar ? Icons.visibility_off : Icons.visibility,
-                                color: AppColors.blue,
+                            const SizedBox(height: 14),
+                            const _FieldLabel('Senha'),
+                            const SizedBox(height: 8),
+                            _InputField(
+                              controller: _senhaCtrl,
+                              obscureText: _obscureSenha,
+                              validator: _validarSenha,
+                              onChanged: (_) => _formKey.currentState?.validate(),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscureSenha ? Icons.visibility_off : Icons.visibility,
+                                  color: AppColors.blue,
+                                ),
+                                onPressed: () {
+                                  setState(() => _obscureSenha = !_obscureSenha);
+                                },
                               ),
-                              onPressed: () {
-                                setState(() => _obscureConfirmar = !_obscureConfirmar);
-                              },
                             ),
-                          ),
-                          const SizedBox(height: 22),
-                          _PrimaryActionButton(
-                            label: 'Criar conta',
-                            onPressed: _loading ? null : _cadastrar,
-                            loading: _loading,
-                          ),
-                          const SizedBox(height: 14),
-                        ],
+                            const SizedBox(height: 14),
+                            const _FieldLabel('Confirmar senha'),
+                            const SizedBox(height: 8),
+                            _InputField(
+                              controller: _confirmarCtrl,
+                              obscureText: _obscureConfirmar,
+                              validator: _validarConfirmarSenha,
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscureConfirmar ? Icons.visibility_off : Icons.visibility,
+                                  color: AppColors.blue,
+                                ),
+                                onPressed: () {
+                                  setState(() => _obscureConfirmar = !_obscureConfirmar);
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 22),
+                            _PrimaryActionButton(
+                              label: 'Criar conta',
+                              onPressed: _loading ? null : _cadastrar,
+                              loading: _loading,
+                            ),
+                            const SizedBox(height: 14),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -355,12 +405,16 @@ class _InputField extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final Widget? suffixIcon;
+  final String? Function(String?)? validator;
+  final ValueChanged<String>? onChanged;
 
   const _InputField({
     required this.controller,
     this.obscureText = false,
     this.keyboardType,
     this.suffixIcon,
+    this.validator,
+    this.onChanged,
   });
 
   @override
@@ -378,10 +432,12 @@ class _InputField extends StatelessWidget {
           ),
         ],
       ),
-      child: TextField(
+      child: TextFormField(
         controller: controller,
         obscureText: obscureText,
         keyboardType: keyboardType,
+        validator: validator,
+        onChanged: onChanged,
         style: const TextStyle(
           fontFamily: 'AdigianaUI',
           fontSize: 16,

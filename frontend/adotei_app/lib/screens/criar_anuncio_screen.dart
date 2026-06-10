@@ -200,7 +200,7 @@ class _CriarAnuncioScreenState extends State<CriarAnuncioScreen> {
           );
 
       if (!mounted) return;
-      context.go('/pets/${pet.id}');
+      context.pushReplacement('/pets/${pet.id}');
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(

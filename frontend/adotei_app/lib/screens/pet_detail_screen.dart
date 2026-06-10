@@ -25,35 +25,49 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     );
   }
 
+  void _voltar() {
+    if (context.canPop()) {
+      context.pop();
+    } else {
+      context.go('/home');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Consumer<PetProvider>(
-        builder: (_, provider, __) {
-          if (provider.isLoadingDetalhe) {
-            return const Center(child: CircularProgressIndicator(color: AppColors.orange));
-          }
-          final pet = provider.petDetalhe;
-          if (pet == null) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.error_outline, size: 48, color: Colors.grey),
-                  const SizedBox(height: 12),
-                  const Text('Não foi possível carregar o pet.'),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () => context.pop(),
-                    child: const Text('Voltar'),
-                  ),
-                ],
-              ),
-            );
-          }
-          return _buildContent(pet);
-        },
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _voltar();
+      },
+      child: Scaffold(
+        backgroundColor: AppColors.background,
+        body: Consumer<PetProvider>(
+          builder: (_, provider, __) {
+            if (provider.isLoadingDetalhe) {
+              return const Center(child: CircularProgressIndicator(color: AppColors.orange));
+            }
+            final pet = provider.petDetalhe;
+            if (pet == null) {
+              return Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.error_outline, size: 48, color: Colors.grey),
+                    const SizedBox(height: 12),
+                    const Text('Não foi possível carregar o pet.'),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: _voltar,
+                      child: const Text('Voltar'),
+                    ),
+                  ],
+                ),
+              );
+            }
+            return _buildContent(pet);
+          },
+        ),
       ),
     );
   }
@@ -96,7 +110,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
       backgroundColor: Colors.white,
       leading: IconButton(
         icon: const Icon(Icons.arrow_back, color: Colors.white),
-        onPressed: () => context.pop(),
+        onPressed: _voltar,
         style: IconButton.styleFrom(
           backgroundColor: Colors.black26,
         ),
