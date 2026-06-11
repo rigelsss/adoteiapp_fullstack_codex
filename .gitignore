@@ -3,6 +3,7 @@
 .flutter-plugins-dependencies
 .idea/
 .claude/
+.prints/
 .pytest_cache/
 .vscode/
 **/__pycache__/
@@ -16,4 +17,3 @@ frontend/.dart_tool/
 frontend/**/*.g.dart
 frontend/**/*.freezed.dart
 docs/
-prints/
