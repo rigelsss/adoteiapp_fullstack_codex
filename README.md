@@ -92,3 +92,5 @@ A URL da API é definida em `lib/core/constants.dart` (`kApiBase`):
 ## Deploy
 
 O backend está configurado para deploy no [Render](https://render.com) via `render.yaml`: ao subir, o serviço executa `seed.py` (popular dados de exemplo) e em seguida inicia o servidor com `start.sh`.
+
+> **Atenção**: no plano gratuito do Render, a instância "dorme" após período de inatividade. A primeira requisição à API pode levar até **60 segundos** enquanto o servidor é reativado.
